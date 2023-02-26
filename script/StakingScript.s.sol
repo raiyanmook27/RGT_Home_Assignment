@@ -12,8 +12,9 @@ contract StakingScript is Script {
         vm.startBroadcast(deployedPrivateKey);
 
         AssetToken assetToken = new AssetToken();
+        RewardToken rewardToken = new RewardToken();
 
-        StakingAsset stakeAsset = new StakingAsset(address(assetToken));
+        StakingAsset stakeAsset = new StakingAsset(assetToken, rewardToken);
 
         vm.stopBroadcast();
     }

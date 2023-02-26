@@ -13,7 +13,7 @@ out/
 node_modules
 
 lib
-
+frontend/
 .json
 
 .txt

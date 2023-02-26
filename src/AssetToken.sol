@@ -8,4 +8,5 @@ contract AssetToken is ERC20 {
     function mintAsset(uint amount) external {
         _mint(msg.sender, amount);
     }
+
 }

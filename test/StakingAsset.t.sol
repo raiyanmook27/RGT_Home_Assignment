@@ -15,21 +15,20 @@ contract StakingAssetTest is Test {
 
     function setUp() public {
         assetToken = new AssetToken();
+        rToken = new RewardToken();
+        pool = new StakingAsset(assetToken, rToken);
 
-        pool = new StakingAsset(address(assetToken));
-        rToken = pool.rewardToken();
         alice = address(1);
-        vm.startPrank(alice);
-        assetToken.mintAsset(40e18);
-        vm.stopPrank();
     }
 
     function testDepositAsset() public {
         vm.startPrank(alice);
-
+        assetToken.mintAsset(40e18);
         IERC20(address(assetToken)).approve(address(pool), 10e18);
 
+        emit log_uint(assetToken.balanceOf(alice));
         pool.deposit(10e18);
+        //abiassetToken.transfer(address(pool), 10e18);
 
         assertEq(IERC20(address(assetToken)).balanceOf(address(pool)), 10e18);
     }
@@ -37,7 +36,7 @@ contract StakingAssetTest is Test {
     function testFailInvalidTokenAmount() public {
         vm.startPrank(alice);
         assetToken.mintAsset(5e18);
-        IERC20(address(assetToken)).approve(address(pool), 5e18);
+        //IERC20(address(assetToken)).approve(address(pool), 5e18);
 
         pool.deposit(5e18);
     }
@@ -64,6 +63,7 @@ contract StakingAssetTest is Test {
         pool.deposit(20e18);
 
         pool.withdrawAssets(1);
+        //abiassetToken.transfer(address(pool), 10e18);
 
         assertEq(pool.getNumberOfAssets(), 1);
     }

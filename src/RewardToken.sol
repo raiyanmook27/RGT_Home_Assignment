@@ -6,7 +6,7 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract RewardToken is ERC20 {
     constructor() ERC20("Reward Token", "RWD") {}
 
-    function mint(uint amount) external {
-        _mint(msg.sender, amount);
+    function mint(address user, uint amount) external {
+        _mint(user, amount);
     }
 }

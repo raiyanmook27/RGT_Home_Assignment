@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/interfaces/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./RewardToken.sol";
+import "./AssetToken.sol";
 
 /***************ERRORS******************/
 
@@ -36,7 +37,9 @@ contract StakingAsset {
 
     /*******************STATE VARIABLES***********************/
 
-    address private immutable aToken;
+    // address private immutable aToken;
+    //address private immutable rToken;
+    AssetToken public assetToken;
     RewardToken public rewardToken;
     mapping(address => Asset[]) public userToAssets;
 
@@ -55,13 +58,12 @@ contract StakingAsset {
         _;
     }
 
-    constructor(address _assetToken) {
-        require(_assetToken != address(0), "Invalid Asset Token");
-        aToken = _assetToken;
-
-        rewardToken = new RewardToken();
-
-        rewardToken.mint(REWARD_POOL_SIZE);
+    constructor(AssetToken _assetToken, RewardToken _rewardToken) {
+        // require(_aToken != address(0), "Invalid Asset Token");
+        // require(_rToken != address(0), "Invalid Asset Token");
+        //aToken = _assetToken;
+        assetToken = _assetToken;
+        rewardToken = _rewardToken;
     }
 
     /**
@@ -85,7 +87,13 @@ contract StakingAsset {
         }
         emit TokensDeposited(msg.sender, numAssets);
         // user has to approve this contract to transfer funds
-        IERC20(aToken).safeTransferFrom(msg.sender, address(this), tokenAmount); //using safeTransferFrom to ensure transfer was successful
+
+        IERC20(address(assetToken)).safeTransferFrom(
+            msg.sender,
+            address(this),
+            tokenAmount
+        ); //using safeTransferFrom to ensure transfer was successful
+        //IERC20(aToken).safeTransfer(address(this), tokenAmount);
     }
 
     /**
@@ -96,10 +104,8 @@ contract StakingAsset {
         uint256 numAssets = getNumberOfAssets();
         require(numAssets != 0, "No Assets");
 
-        uint256 rewardPoolBalance = rewardToken.balanceOf(address(this));
-        if (rewardPoolBalance == 0) {
-            revert StakingAsset__NotEnoughRewards();
-        }
+        uint256 rewardPoolBalance = rewardToken.totalSupply();
+        require(rewardPoolBalance < REWARD_POOL_SIZE, "No rewards");
 
         uint256 totalRewards;
         for (uint256 i; i < numAssets; ) {
@@ -112,14 +118,10 @@ contract StakingAsset {
                 i++; //reduce gas since overflow will never occur
             }
         }
-        if (totalRewards > rewardPoolBalance) {
-            //make sure rewards is never more than pool
-            revert StakingAsset__NotEnoughRewards();
-        }
 
         emit RewardsClaimed(msg.sender, totalRewards);
         // Transfer rewards to the user.
-        IERC20(address(rewardToken)).safeTransfer(msg.sender, totalRewards);
+        rewardToken.mint(msg.sender, totalRewards);
     }
 
     /**
@@ -148,6 +150,4 @@ contract StakingAsset {
     function getNumberOfAssets() public view returns (uint) {
         return (userToAssets[msg.sender]).length;
     }
-
-    function _claimAssets() private {}
 }
