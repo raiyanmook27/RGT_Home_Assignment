@@ -1,6 +1,6 @@
-export const assetAddress = "0xc83D2b8d7cf0bF5D5cAA7FF4E26b9bde300f8483";
-export const stakingAssetAddress = "0x6375CA2b6d37EB2e47dB32C85EdDf8F9C9CC1283";
-export const rewardAddress = "0xe3e0232E042415ceAAdec7Dd8Ea1ec5071BA9Df9";
+export const assetAddress = "0x4DD4264183444d80F4f17818213dBFDAd7b31419";
+export const stakingAssetAddress = "0x481a7fa22024f26D523e11C946D144F6EEa92fd6";
+export const rewardAddress = "0x7135F36419e51b20AFdeB5bdCC72C760D1300DA2";
 export const rewardAbi = [
   {
     inputs: [],
@@ -114,6 +114,19 @@ export const rewardAbi = [
       },
     ],
     name: "balanceOf",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "cap",
     outputs: [
       {
         internalType: "uint256",
