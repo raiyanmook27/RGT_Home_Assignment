@@ -44,14 +44,17 @@ async function connect() {
 }
 
 async function mintAssetToken() {
-  const amount = ethers.utils.parseEther("20");
+  //const amount = ethers.utils.parseEther("20");
   if (typeof window.ethereum != "undefined") {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
 
     const signer = provider.getSigner();
     const assetcontract = new ethers.Contract(assetAddress, assetAbi, signer);
+    const mntAmount = document.getElementById("mintAmount").value;
 
-    const res = await assetcontract.mintAsset(amount);
+    const res = await assetcontract.mintAsset(
+      ethers.utils.parseEther(`${mntAmount}`)
+    );
     await listenForTransaction(res, provider);
     const balance = await assetcontract.balanceOf(signer.getAddress());
 
@@ -60,24 +63,23 @@ async function mintAssetToken() {
 }
 
 async function approveContract() {
-  const amount = ethers.utils.parseEther("20");
   if (typeof window.ethereum != "undefined") {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
 
     const signer = provider.getSigner();
     const assetcontract = new ethers.Contract(assetAddress, assetAbi, signer);
-    const stakingCon = new ethers.Contract(
+    const appAmount = document.getElementById("approveAmount").value;
+
+    const rep = await assetcontract.approve(
       stakingAssetAddress,
-      stakingAssetAbi,
-      signer
+      ethers.utils.parseEther(`${appAmount}`)
     );
-    const rep = await assetcontract.approve(stakingAssetAddress, amount);
     await listenForTransaction(rep, provider);
     const allow = await assetcontract.allowance(
       signer.getAddress(),
       stakingAssetAddress
     );
-    alert(`${allow}`);
+    alert(`${allow} tokens Approved`);
   }
 }
 
@@ -92,8 +94,11 @@ async function depositAsset() {
       stakingAssetAbi,
       signer
     );
+    const tokenAmount = document.getElementById("tokenAmount").value;
 
-    const rep = await stakingCon.deposit(amount);
+    const rep = await stakingCon.deposit(
+      ethers.utils.parseEther(`${tokenAmount}`)
+    );
     await listenForTransaction(rep, provider);
     const num = await stakingCon.getNumberOfAssets();
 
